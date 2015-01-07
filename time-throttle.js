@@ -23,26 +23,25 @@ window.queue = function(exports) {
 		}
 	}
 	
-	TimeThrottle.prototype.hasThrottleTimeElapsed = function(itemType) {
-		// This may be off-loaded elsewhere
-		var lastExecuteTime = itemType.lastExecuteTime;
-		var today = new Date();
-
-		var diff = today.getTime() - lastExecuteTime.getTime();
-
-		var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+	TimeThrottle.prototype.hasThrottleTimeElapsed = function(itemType) {		
+		var lastExecuteTime = itemType.lastExecuteTime,
+			today = new Date(),
+			diff = today.getTime() - lastExecuteTime.getTime(),
+			days = Math.floor(diff / (1000 * 60 * 60 * 24)),
+			hours,
+			mins,
+			seconds,
+			result;
+			
 		diff -=  days * (1000 * 60 * 60 * 24);
-
-		var hours = Math.floor(diff / (1000 * 60 * 60));
+		hours = Math.floor(diff / (1000 * 60 * 60));
 		diff -= hours * (1000 * 60 * 60);
-
-		var mins = Math.floor(diff / (1000 * 60));
+		mins = Math.floor(diff / (1000 * 60));
 		diff -= mins * (1000 * 60);
-
-		var seconds = Math.floor(diff / (1000));
+		seconds = Math.floor(diff / (1000));
 		diff -= seconds * (1000);
 
-		var result = ((seconds * 1000) > itemType.interval);
+		result = ((seconds * 1000) > itemType.interval);
 		this.log.info('elapsed milliseconds: ' + (seconds * 1000) + " interval milliseconds: " + itemType.interval);
 		this.log.info('hasThrottleTimeElapsed returning: ' + result);
 

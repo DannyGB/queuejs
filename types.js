@@ -6,6 +6,14 @@ window.queue = function(exports) {
 	
 	Types.prototype.register = function(item) {	
 		// Add new item to end of array
+		var isExistingType = this.types.map(function(type) {
+			return type.id === item.id;
+		}).indexOf(true);
+		
+		if(isExistingType >= 0) {
+			throw Error('A type with this id is already registered: ' + item.id);
+		}
+		
 		this.types.push(item);
 	}
 	

@@ -3,6 +3,8 @@
 <head>
 
 <script src='./logger.js' type='text/javascript'></script>
+<script src='./max-execution-throttle.js' type='text/javascript'></script>
+<script src='./max-execution-throttle-in-timespan.js' type='text/javascript'></script>
 <script src='./time-throttle.js' type='text/javascript'></script>
 <script src='./types.js' type='text/javascript'></script>
 <script src='./queue.js' type='text/javascript'></script>
@@ -17,8 +19,9 @@
 		element.appendChild(header);
 	}
 
-
 	window.queue.processor.registerType({ id: 1, throttle: "time-throttle", interval: 100 });
+	window.queue.processor.registerType({ id: 2, throttle: "max-execution-throttle", maxExecutions: 1 });
+	window.queue.processor.registerType({ id: 3, throttle: "max-execution-throttle-in-timespan", maxExecutions: 1, interval: 100 });
 	
 	window.queue.processor.addToQueue({ name: "test1", type: 1 ,action : function() {		
 		displayProgress("Processed item 1");		
@@ -26,15 +29,37 @@
 	window.queue.processor.addToQueue({ name: "test2", type: 1, action : function() {
 		displayProgress("Processed item 2");
 	}});
-	window.queue.processor.addToQueue({ name: "test3", action : function() {
+	window.queue.processor.addToQueue({ name: "test3", type: 2, action : function() {
 		displayProgress("Processed item 3");		
 	}});
-	window.queue.processor.addToQueue({ name: "test4", action : function() {
+	window.queue.processor.addToQueue({ name: "test4", type: 2, action : function() {
 		displayProgress("Processed item 4");
 	}});
-	window.queue.processor.addToQueue({ name: "test5", action : function() {
+	
+	window.queue.processor.addToQueue({ name: "test5", type: 3, action : function() {
 		displayProgress("Processed item 5");
 	}});
+	
+	window.queue.processor.addToQueue({ name: "test6", type: 3, action : function() {
+		displayProgress("Processed item 6");
+	}});
+	
+	window.queue.processor.addToQueue({ name: "test7", type: 3, action : function() {
+		displayProgress("Processed item 7");
+	}});
+	
+	// Anon
+	window.queue.processor.addToQueue({ name: "testAnonymous", action : function() {
+		displayProgress("Processed item Anonymous");
+	}});
+	
+	
+	setTimeout(function() {
+		window.queue.processor.addToQueue({ name: "testAnonymousAfterStop", action : function() {
+			displayProgress("Processed item testAnonymousAfterStop");
+		}});
+	}, 30000);
+	
 
 </script>
 
