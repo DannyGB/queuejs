@@ -9,7 +9,19 @@ window.queue = function(exports) {
 			console.log("info: " + text);
 		}
 	}		
+
+	Logger.prototype.error = function(text) {
+		if(this.loggingEnabled) {
+			console.log("error: " + text);
+		}
+	}	
 	
+	Logger.prototype.debug = function(text) {
+		if(this.loggingEnabled) {
+			console.log("debug: " + text);
+		}
+	}	
+
 	exports.log = Logger;
 	return exports; 
 
