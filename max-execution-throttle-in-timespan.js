@@ -1,8 +1,16 @@
-window.queue = function(exports) {	
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+
+window.queue = function(_super, exports) {	
 
 	var Log = exports.log;
 	
-	// This is a combination of time-throttle and max-execution-throttle and is an ideal candidate for inheritance
+	__extends(MaxExecutionThrottleInTimeSpan, _super);
+		
 	function MaxExecutionThrottleInTimeSpan(log) {
 		if(!log) {
 			throw Error("a logger must be supplied");
@@ -46,33 +54,8 @@ window.queue = function(exports) {
 			this.log.info('item type is max-execution-throttle-in-timespan throttled & has reached the maximum excution limit within the timespan');
 		}
 	}
-	
-	MaxExecutionThrottleInTimeSpan.prototype.hasThrottleTimeElapsed = function(itemType) {		
-		var lastExecuteTime = itemType.lastExecuteTime,
-			today = new Date(),
-			diff = today.getTime() - lastExecuteTime.getTime(),
-			days = Math.floor(diff / (1000 * 60 * 60 * 24)),
-			hours,
-			mins,
-			seconds,
-			result;
-			
-		diff -=  days * (1000 * 60 * 60 * 24);
-		hours = Math.floor(diff / (1000 * 60 * 60));
-		diff -= hours * (1000 * 60 * 60);
-		mins = Math.floor(diff / (1000 * 60));
-		diff -= mins * (1000 * 60);
-		seconds = Math.floor(diff / (1000));
-		diff -= seconds * (1000);
-
-		result = ((seconds * 1000) > itemType.interval);
-		this.log.info('elapsed milliseconds: ' + (seconds * 1000) + " interval milliseconds: " + itemType.interval);
-		this.log.info('hasThrottleTimeElapsed returning: ' + result);
-
-		return result;
-	}	
-	
+		
 	exports.maxexecutionthrottleintimespan = MaxExecutionThrottleInTimeSpan;
 	return exports;
 
-}(window.queue || {})
+}(window.queue.timethrottle, window.queue || {})

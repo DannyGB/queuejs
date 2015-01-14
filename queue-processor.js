@@ -16,11 +16,10 @@ window.queue = function(exports) {
 			"running" : "running"
 		};
 		
-		this.q = queue;	
-		this.types = registeredTypes;		
-		this.processInterval = processInterval || 3000;		
-		this.log = log;
-		this.log.info('Processing every: ' + this.processInterval);	
+		this._q = queue;
+		this._types = registeredTypes;
+		this.processInterval = processInterval || 3000;
+		this.log = log;		
 		this.processors = {
 			"time-throttle": throttles["time-throttle"],
 			"max-execution-throttle" : throttles["max-execution-throttle"],
@@ -48,17 +47,17 @@ window.queue = function(exports) {
 	}
 		
 	Processor.prototype.start = function() {
-		
+		this.log.info('Processing every: ' + this.processInterval);
 		this.state = this.availableStates.running;
 		this.intervalId = setInterval(function() {
 			this.log.info('processor tick');			
-			if(this.q.length() > 0) {	
+			if(this._q.length > 0) {	
 				// Get first array item and remove it from the q			
-				var item = this.q.splice(0,1)[0];			
+				var item = this._q.splice(0,1)[0];			
 				this.log.info('processing item: ' + item.name);
 				this._actionItem(item);
 
-				if(this.q.length() <= 0) {
+				if(this._q.length <= 0) {
 					this.stop();
 					this.log.info('No work, stop stopping the processor, this.state: ' + this.state);					
 				}
@@ -99,8 +98,8 @@ window.queue = function(exports) {
 
 	Processor.prototype.getItemType = function(item) {
 		this.log.info('getting the items type');
-		if(this.types) {
-			var type = this.types.getTypeById(item.type);
+		if(this._types) {
+			var type = this._types.getTypeById(item.type);
 			if(type) {
 				return type;
 			}
@@ -111,14 +110,14 @@ window.queue = function(exports) {
 	}	
 	
 	Processor.prototype.addToQueue = function(item) {
-		this.q.add(item);
+		this._q.add(item);
 		if(this.state === this.availableStates.stopped) {
 			this.start();
 		}
 	}
 	
 	Processor.prototype.registerType = function(item) {
-		this.types.register(item);
+		this._types.register(item);
 	}	
 
 	Processor.prototype.stopped = function(callback) {
@@ -139,7 +138,7 @@ window.queue = function(exports) {
 		}, 
 		1000, log);
 		
-	processor.start();
+	/*processor.start();*/
 	
 	exports.processor = processor;
 	return exports;

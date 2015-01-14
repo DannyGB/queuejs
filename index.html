@@ -2,10 +2,15 @@
 
 <head>
 
+<script src='./anon-work-item.js' type='text/javascript'></script>
+<script src='./work-item.js' type='text/javascript'></script>
+<script src='./interval-work-item.js' type='text/javascript'></script>
+<script src='./throttle-type.js' type='text/javascript'></script>
+<script src='./maxexecution-throttle-type.js' type='text/javascript'></script>
 <script src='./logger.js' type='text/javascript'></script>
+<script src='./time-throttle.js' type='text/javascript'></script>
 <script src='./max-execution-throttle.js' type='text/javascript'></script>
 <script src='./max-execution-throttle-in-timespan.js' type='text/javascript'></script>
-<script src='./time-throttle.js' type='text/javascript'></script>
 <script src='./at-interval.js' type='text/javascript'></script>
 <script src='./types.js' type='text/javascript'></script>
 <script src='./queue.js' type='text/javascript'></script>
@@ -14,25 +19,27 @@
 <script type='text/javascript'>
 
 	var displayProgress = function(text) {
-		var element = document.getElementById('content');	
-		var header = document.createElement('span');
+		var element = document.getElementById('content'),
+		header = document.createElement('span');
+		
 		header.appendChild(document.createTextNode(text));
 		element.appendChild(header);
 	}
 
-	var stopTestQueued = false;
-	var stopAtInterval = 0;
-	window.queue.processor.registerType({ id: 1, throttle: "time-throttle", interval: 100 });
-	window.queue.processor.registerType({ id: 2, throttle: "max-execution-throttle", maxExecutions: 1 });
-	window.queue.processor.registerType({ id: 3, throttle: "max-execution-throttle-in-timespan", maxExecutions: 1, interval: 100 });
-	window.queue.processor.registerType({ id: 4, throttle: "at-interval", interval: 10000 });
+	var stopTestQueued = false,
+		stopAtInterval = 0;
+		
+	window.queue.processor.registerType(new window.queue.throttletype(1, "time-throttle", 100));		
+	window.queue.processor.registerType(new window.queue.maxexecutionthrottletype(2, "max-execution-throttle", 0, 1));	
+	window.queue.processor.registerType(new window.queue.maxexecutionthrottletype(3, "max-execution-throttle-in-timespan", 100, 1));
+	window.queue.processor.registerType(new window.queue.throttletype(4, "at-interval", 10000));
 	window.queue.processor.stopped(function() {
 		console.log('Handling Processor stopped event');
 
 		if(!stopTestQueued) {
-			window.queue.processor.addToQueue({ name: "testAnonymousAfterStop", action : function() {
+			window.queue.processor.addToQueue(new window.queue.anonworkitem( "testAnonymousAfterStop", function() {
 				displayProgress("Processed item testAnonymousAfterStop");
-			}});
+			}));
 
 			stopTestQueued = true;
 		}
@@ -42,43 +49,44 @@
 		console.log('Handling Processor started event');
 	});
 
-	window.queue.processor.addToQueue({ name: "test1", type: 1 ,action : function() {		
+	window.queue.processor.addToQueue(new window.queue.workitem("test1", 1, function() {		
 		displayProgress("Processed item 1");		
-	}});
-	window.queue.processor.addToQueue({ name: "test2", type: 1, action : function() {
+	}));
+	window.queue.processor.addToQueue(new window.queue.workitem( "test2",  1,  function() {
 		displayProgress("Processed item 2");
-	}});
-	window.queue.processor.addToQueue({ name: "test3", type: 2, action : function() {
+	}));
+	window.queue.processor.addToQueue(new window.queue.workitem( "test3", 2,  function() {
 		displayProgress("Processed item 3");		
-	}});
-	window.queue.processor.addToQueue({ name: "test4", type: 2, action : function() {
+	}));
+	window.queue.processor.addToQueue(new window.queue.workitem("test4",  2,  function() {
 		displayProgress("Processed item 4");
-	}});
+	}));
 	
-	window.queue.processor.addToQueue({ name: "test5", type: 3, action : function() {
+	window.queue.processor.addToQueue(new window.queue.workitem( "test5",  3,  function() {
 		displayProgress("Processed item 5");
-	}});
+	}));
 	
-	window.queue.processor.addToQueue({ name: "test6", type: 3, action : function() {
+	window.queue.processor.addToQueue(new window.queue.workitem( "test6",  3,  function() {
 		displayProgress("Processed item 6");
-	}});
+	}));
 	
-	window.queue.processor.addToQueue({ name: "test7", type: 3, action : function() {
+	window.queue.processor.addToQueue(new window.queue.workitem("test7",  3,  function() {
 		displayProgress("Processed item 7");
-	}});
+	}));
 
-	window.queue.processor.addToQueue({ name: "test8", type: 4, action : function() {
+	window.queue.processor.addToQueue(new window.queue.intervalworkitem("test8",  4,  function() {
 		displayProgress("Processed item 8");
-	}, checkContinue: function() {
+	},  function() {
 		stopAtInterval++;
 		return stopAtInterval < 3;
-	}});
+	}));
 	
 	// Anon
-	window.queue.processor.addToQueue({ name: "testAnonymous", action : function() {
+	window.queue.processor.addToQueue(new window.queue.anonworkitem( "testAnonymous",  function() {
 		displayProgress("Processed item Anonymous");
-	}});	
+	}));	
 	
+	window.queue.processor.start();
 
 </script>
 

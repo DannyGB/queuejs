@@ -17,7 +17,6 @@ Further work:
 1. De-qeueuing of waiting work
 2. Prioritise work items
 3. Allow changing of the processer execution interval
-4. Repeatable execution
 
 Requirements:
 
@@ -32,3 +31,7 @@ Requirements:
 	i.e. Only execute the work item if a work item of the same type has not been executed for x number of seconds
 
 4. Anonymous work items will be executed with no queue logic being performed
+
+5. Repeat execution at given intervals allowing a check to see if we should continue processing or stop
+
+	i.e. Execute the work item every x seconds unless instructed to stop 
